@@ -50,7 +50,6 @@ class YandexMusicProvider(PodcastProvider):
                             description=track.short_description,
                             duration=track.duration,
                             source_url=self.create_load_track_url(track.id),
-                            tags=[],
                         )
         except ValidationError as validation_error:
             _logger.error('Ошибка при создании объекта альбома', exc_info=validation_error)

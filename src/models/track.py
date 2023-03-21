@@ -11,3 +11,4 @@ class Track:
     publication_date: datetime
     duration: timedelta
     sources: list[TrackSource]
+    tags: list[str]

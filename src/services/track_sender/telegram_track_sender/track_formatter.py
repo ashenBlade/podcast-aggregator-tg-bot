@@ -18,10 +18,22 @@ def format_sources(track: Track):
     )
 
 
+def format_tags(track: Track):
+    if not track.tags:
+        return None
+
+    return ' '.join(
+        f'#{tag}'
+        for tag
+        in track.tags
+    )
+
+
 def format_track_markdown(track: Track):
     return (
-        f'**{track.name}**\n\n'
+        f'*{track.name}*\n'
         f'{track.description}\n\n'
         f'Длительность: {format_duration(track.duration)}\n'
-        f'{format_sources(track)}'
+        f'{format_sources(track)}\n'
+        f'{format_tags(track)}'
     )

@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import date, timedelta
 
 from models.podcast_provider import PodcastProvider
@@ -12,6 +12,7 @@ class Podcast:
     name: str
     description: str
     providers: list[PodcastProvider]
+    tags: list[str] | None = None
 
     async def get_track_created_in_specified_day(self, published_date: date) -> Track | None:
         all_tracks = [
@@ -54,4 +55,5 @@ class Podcast:
             description=first_description,
             sources=track_sources,
             publication_date=published_date,
+            tags=self.tags
         )

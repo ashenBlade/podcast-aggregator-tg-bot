@@ -7,7 +7,6 @@ class ProviderTrack:
     id: int
     name: str
     description: str
-    tags: str
     publication_date: datetime
     duration: timedelta
     source_url: str
