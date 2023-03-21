@@ -15,6 +15,6 @@ class Album(BaseModel):
     def get_track_published_in(self, publish_date: date) -> Track | None:
         for volume in self.volumes:
             for track in volume:
-                if track.publication_date.date() == publish_date:
+                if track.publication_date == publish_date:
                     return track
         return None
