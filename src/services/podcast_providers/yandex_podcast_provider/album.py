@@ -1,5 +1,4 @@
 from datetime import date
-from functools import cached_property
 
 from pydantic import BaseModel, Field
 

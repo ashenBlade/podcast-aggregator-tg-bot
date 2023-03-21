@@ -8,7 +8,6 @@ from models.track_source import TrackSource
 class Track:
     name: str
     description: str
-    tags: str
     publication_date: datetime
     duration: timedelta
     sources: list[TrackSource]

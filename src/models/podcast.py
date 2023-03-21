@@ -11,7 +11,6 @@ class Podcast:
     id: int
     name: str
     description: str
-    tags: list[str]
     providers: list[PodcastProvider]
 
     async def get_track_created_in_specified_day(self, published_date: date) -> Track | None:
@@ -54,10 +53,5 @@ class Podcast:
             duration=timedelta(seconds=average_duration_seconds),
             description=first_description,
             sources=track_sources,
-            tags=[
-                p.name
-                for p
-                in self.providers
-            ],
             publication_date=published_date,
         )

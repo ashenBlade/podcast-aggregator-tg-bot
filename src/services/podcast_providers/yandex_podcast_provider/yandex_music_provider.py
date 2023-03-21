@@ -64,4 +64,7 @@ class YandexMusicProvider(PodcastProvider):
     def __str__(self) -> str:
         return f'YandexMusicProvider(album={self.album!r})'
 
+    def __repr__(self) -> str:
+        return f'YandexMusicProvider(album={self.album!r})'
+
 
