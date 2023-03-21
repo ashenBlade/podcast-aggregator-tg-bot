@@ -5,7 +5,10 @@ from models.provider_track import ProviderTrack
 
 
 class PodcastProvider(ABC):
-    name: str
+    @property
+    @abstractmethod
+    def name(self):
+        ...
 
     @abstractmethod
     async def get_track_published_in_specified_date(self, publish_date: date) -> ProviderTrack | None:

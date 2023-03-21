@@ -14,6 +14,10 @@ _logger = logging.getLogger('YandexPodcastProvider')
 
 
 class YandexMusicProvider(PodcastProvider):
+    @property
+    def name(self):
+        return 'Яндекс.Музыка'
+
     album: int
 
     def __init__(self, album: int):
@@ -33,7 +37,8 @@ class YandexMusicProvider(PodcastProvider):
         try:
             async with aiohttp.ClientSession() as session:
                 async with session.get(self.load_album_url) as response:
-                    album = Album(**(await response.json()))
+                    json_ = await response.json()
+                    album = Album(**(json_))
                     track = album.get_track_published_in(publish_date)
                     if not track:
                         return None
@@ -55,3 +60,8 @@ class YandexMusicProvider(PodcastProvider):
             _logger.error('Ошибка во время запроса к серверам яндекса', exc_info=e)
 
         return []
+
+    def __str__(self) -> str:
+        return f'YandexMusicProvider(album={self.album!r})'
+
+
