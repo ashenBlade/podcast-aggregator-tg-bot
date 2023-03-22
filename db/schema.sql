@@ -27,13 +27,3 @@ create table tags(
     id integer primary key autoincrement,
     tag varchar not null unique
 );
-
-insert into tags(tag)
-values
-    ('frontend'),
-    ('backend'),
-    ('mobile'),
-    ('devops'),
-    ('network'),
-    ('fullstack'),
-    ('web');
