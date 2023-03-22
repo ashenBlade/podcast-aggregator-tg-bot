@@ -42,7 +42,7 @@ async def main():
         try:
             podcasts = await podcast_repository.get_all_podcasts()
             _logger.debug('Загружено %i подкастов из БД', len(podcasts))
-            today = datetime.today().date()
+            today = datetime.today().date() - timedelta(days=2)
             tracks = [
                 track for track in [
                     await podcast.get_track_created_in_specified_day(today)
