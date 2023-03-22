@@ -2,6 +2,7 @@ from dataclasses import dataclass, field
 from datetime import date, timedelta
 
 from models.podcast_provider import PodcastProvider
+from models.provider_track import ProviderTrack
 from models.track import Track
 from models.track_source import TrackSource
 
@@ -15,12 +16,19 @@ class Podcast:
     tags: list[str] | None = None
 
     async def get_track_created_in_specified_day(self, published_date: date) -> Track | None:
-        all_tracks: list[tuple[Track, PodcastProvider]] = []
-        for provider in self.providers:
-            track = await provider.get_track_published_in_specified_date(published_date)
-            if track:
-                all_tracks.append((track, provider))
-
+        # all_tracks: list[tuple[ProviderTrack, PodcastProvider]] = []
+        # for provider in self.providers:
+        #     track = await provider.get_track_published_in_specified_date(published_date)
+        #     if track:
+        #         all_tracks.append((track, provider))
+        all_tracks: list[tuple[ProviderTrack, PodcastProvider]] = [
+            (track, provider)
+            for (track, provider)
+            in [
+                (await provider.get_track_published_in_specified_date(published_date), provider)
+                for provider in self.providers
+            ] if track
+        ]
         if not any(all_tracks):
             return None
 
@@ -49,11 +57,17 @@ class Podcast:
             ''
         )
 
+        provider_infos = [
+            track.provider_info
+            for (track, provider)
+            in all_tracks
+        ]
         return Track(
             name=first_name,
             duration=timedelta(seconds=average_duration_seconds),
             description=first_description,
             sources=track_sources,
             publication_date=published_date,
-            tags=self.tags
+            tags=self.tags,
+            provider_infos=provider_infos
         )

@@ -42,18 +42,19 @@ async def main():
         try:
             podcasts = await podcast_repository.get_all_podcasts()
             _logger.debug('Загружено %i подкастов из БД', len(podcasts))
-            today = datetime.today().date() - timedelta(days=2)
+            today = datetime.today().date()
             tracks = [
                 track for track in [
                     await podcast.get_track_created_in_specified_day(today)
                     for podcast
                     in podcasts
-                ] if track
+                ] if track and not await podcast_repository.is_track_already_sent(track)
             ]
             _logger.debug('Обнаружено %i новых треков подкастов', len(tracks))
             if tracks:
                 for track in tracks:
                     await sender.send_track(track)
+                    await podcast_repository.mark_track_sent(track)
 
         except (KeyboardInterrupt, asyncio.CancelledError) as e:
             _logger.info('Запрошено завершение работы во время обработки подкастов', exc_info=e)

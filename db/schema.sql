@@ -10,6 +10,12 @@ create table yandex_music_providers(
     primary key (podcast_id, album)
 );
 
+create table yandex_music_published_tracks(
+    track_id integer primary key,
+    published_time timestamp not null
+);
+
+create index YANDEX_MUSIC_PUBLISHED_TRACKS_IDX on yandex_music_published_tracks(track_id);
 
 create table podcast_tag(
     podcast_id integer references podcasts(id) not null,

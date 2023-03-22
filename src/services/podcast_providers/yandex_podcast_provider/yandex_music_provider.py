@@ -8,6 +8,7 @@ from pydantic import ValidationError
 from models.podcast_provider import PodcastProvider
 from models.provider_track import ProviderTrack
 from services.podcast_providers.yandex_podcast_provider.album import Album
+from services.podcast_providers.yandex_podcast_provider.yandex_provider_info import YandexProviderInfo
 
 _logger = logging.getLogger(__name__)
 
@@ -49,6 +50,7 @@ class YandexMusicProvider(PodcastProvider):
                 description=track.short_description,
                 duration=track.duration,
                 source_url=self.create_source_url(track.id),
+                provider_info=YandexProviderInfo(id=track.id)
             )
         except ValidationError as validation_error:
             _logger.error('Ошибка при создании объекта альбома', exc_info=validation_error)

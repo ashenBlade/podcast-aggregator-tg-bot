@@ -1,9 +1,15 @@
+import datetime
 import json
+import logging
 import sqlite3
+from datetime import datetime
 
 from abstractions.podcast_repository import PodcastRepository
-from models import Podcast
+from models import Podcast, Track
 from services.podcast_providers import YandexMusicProvider
+from services.podcast_providers.yandex_podcast_provider.yandex_provider_info import YandexProviderInfo
+
+_logger = logging.getLogger(__name__)
 
 
 def parse_podcast_row(row: tuple):
@@ -42,3 +48,51 @@ class SqlitePodcastRepository(PodcastRepository):
                 for row
                 in cursor.fetchall()
             ]
+
+    async def is_track_already_sent(self, track: Track) -> bool:
+        """
+        Был ли уже отправлен трек или нет.
+        Если хотя бы один из провайдеров отправлен, возвращает true
+        """
+        if not track.provider_infos:
+            return
+
+        with sqlite3.connect(self.database) as connection:
+            for provider_info in track.provider_infos:
+                try:
+                    if isinstance(provider_info, YandexProviderInfo):
+                        cursor = connection.execute(
+                            'select 1 from yandex_music_published_tracks where track_id = $1',
+                            (provider_info.id,)
+                        )
+                        exists = cursor.fetchone()
+                        if exists and exists[0]:
+                            return True
+                    else:
+                        _logger.warning('Неизвестный тип информации о провайдере: %s', provider_info)
+                except Exception as e:
+                    _logger.error('Ошибка во время обновления данных об отправленных треках', exc_info=e)
+            return False
+
+    async def mark_track_sent(self, track: Track):
+        """
+        Пометить трек как отправленный, чтобы дальше не отправлять
+        """
+        if not track.provider_infos:
+            return
+
+        with sqlite3.connect(self.database) as connection:
+            for provider_info in track.provider_infos:
+                try:
+                    if isinstance(provider_info, YandexProviderInfo):
+                        connection.execute(
+                            'insert into yandex_music_published_tracks(track_id, published_time) '
+                            'values ($1, $2) on conflict do nothing;',
+                            (provider_info.id, datetime.now())
+                        )
+                        _logger.info('Трек из яндекс музыки id %i сохранен как отправленный', provider_info.id)
+                    else:
+                        _logger.warning('Неизвестный тип информации о провайдере: %s', provider_info)
+                except Exception as e:
+                    _logger.error('Ошибка во время обновления данных об отправленных треках', exc_info=e)
+
