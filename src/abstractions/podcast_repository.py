@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from models import Podcast
+from models.podcast import Podcast
 
 
 class PodcastRepository(ABC):

@@ -11,16 +11,10 @@ from models.track_source import TrackSource
 class Podcast:
     id: int
     name: str
-    description: str
     providers: list[PodcastProvider]
-    tags: list[str] | None = None
+    tags: list[str] = field(default_factory=list)
 
     async def get_track_created_in_specified_day(self, published_date: date) -> Track | None:
-        # all_tracks: list[tuple[ProviderTrack, PodcastProvider]] = []
-        # for provider in self.providers:
-        #     track = await provider.get_track_published_in_specified_date(published_date)
-        #     if track:
-        #         all_tracks.append((track, provider))
         all_tracks: list[tuple[ProviderTrack, PodcastProvider]] = [
             (track, provider)
             for (track, provider)
@@ -69,5 +63,6 @@ class Podcast:
             sources=track_sources,
             publication_date=published_date,
             tags=self.tags,
-            provider_infos=provider_infos
+            provider_infos=provider_infos,
+            podcast=self
         )

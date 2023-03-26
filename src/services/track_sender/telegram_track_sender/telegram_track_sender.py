@@ -1,13 +1,29 @@
 import logging
 
 from aiogram import Bot
+from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 from abstractions.track_sender import TrackSender
-from models import Track
+from models.track import Track
 from services.track_sender.telegram_track_sender.track_formatter import format_track_markdown
 
 
-_logger = logging.getLogger(__file__)
+_logger = logging.getLogger(__name__)
+
+
+def create_reply_source_url_keyboard(track: Track):
+    if not track.sources:
+        return
+    keyboard = InlineKeyboardMarkup(row_width=1)
+    for button in [
+        InlineKeyboardButton(
+            text=source.provider.name,
+            url=source.url
+        )
+        for source in track.sources
+    ]:
+        keyboard.add(button)
+    return keyboard
 
 
 class TelegramTrackSender(TrackSender):
@@ -19,7 +35,10 @@ class TelegramTrackSender(TrackSender):
 
     async def send_track(self, track: Track):
         formatted_message = format_track_markdown(track)
-        try:
-            await self.bot.send_message(self.chat_id, formatted_message, parse_mode='Markdown')
-        except Exception as e:
-            _logger.error('Ошибка во время отправки сообщения в чат %i', self.chat_id, exc_info=e)
+        keyboard = create_reply_source_url_keyboard(track)
+        await self.bot.send_message(
+            self.chat_id,
+            formatted_message,
+            parse_mode='Markdown',
+            reply_markup=keyboard
+        )

@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from models import Track
+from models.track import Track
 
 
 class TrackSender(ABC):

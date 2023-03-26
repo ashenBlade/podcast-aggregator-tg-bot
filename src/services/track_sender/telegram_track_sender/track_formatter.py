@@ -1,6 +1,9 @@
+import itertools
 from datetime import datetime, timedelta
 
-from models import Track
+import aiogram.utils.markdown
+
+from models.track import Track
 
 
 def format_duration(duration: timedelta):
@@ -19,13 +22,11 @@ def format_sources(track: Track):
 
 
 def format_tags(track: Track):
-    if not track.tags:
-        return None
-
+    podcast_name_tag = track.podcast.name.replace(' ', '')
     return ' '.join(
         f'#{tag}'
         for tag
-        in track.tags
+        in itertools.chain(track.tags or tuple(), (podcast_name_tag,))
     )
 
 
@@ -34,6 +35,5 @@ def format_track_markdown(track: Track):
         f'*{track.name}*\n'
         f'{track.description}\n\n'
         f'Длительность: {format_duration(track.duration)}\n'
-        f'{format_sources(track)}\n'
-        f'{format_tags(track)}'
+        f'{format_tags(track)}\n'
     )
