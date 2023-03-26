@@ -5,7 +5,8 @@ import sqlite3
 from datetime import datetime
 
 from abstractions.podcast_repository import PodcastRepository
-from models import Podcast, Track
+from models.podcast import Podcast
+from models.track import Track
 from services.podcast_providers import YandexMusicProvider
 from services.podcast_providers.yandex_podcast_provider.yandex_provider_info import YandexProviderInfo
 
@@ -20,7 +21,7 @@ def parse_podcast_row(row: tuple):
         name=name,
         description=description,
         providers=providers,
-        tags=json.loads(tags_str) if tags_str else None
+        tags=json.loads(tags_str) if tags_str else []
     )
 
 
