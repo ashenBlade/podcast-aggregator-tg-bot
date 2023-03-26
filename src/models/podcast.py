@@ -11,7 +11,6 @@ from models.track_source import TrackSource
 class Podcast:
     id: int
     name: str
-    description: str
     providers: list[PodcastProvider]
     tags: list[str] = field(default_factory=list)
 
