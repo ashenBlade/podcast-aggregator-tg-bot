@@ -6,9 +6,10 @@ import aiohttp
 from pydantic import ValidationError
 
 from models.podcast_provider import PodcastProvider
-from models.provider_track import ProviderTrack
-from services.podcast_providers.yandex_podcast_provider.album import Album
-from services.podcast_providers.yandex_podcast_provider.yandex_provider_info import YandexProviderInfo
+from models.published_provider_track import PublishedProviderTrack
+from podcast_providers.yandex_podcast_provider.album import Album
+
+from podcast_providers.yandex_podcast_provider.yandex_published_provider_track import YandexPublishedProviderTrack
 
 _logger = logging.getLogger(__name__)
 
@@ -30,7 +31,7 @@ class YandexMusicProvider(PodcastProvider):
     def load_album_url(self) -> str:
         return f'https://api.music.yandex.net/albums/{self.album}/with-tracks'
 
-    async def get_track_published_in_specified_date(self, publish_date: date) -> ProviderTrack | None:
+    async def get_track_published_at(self, publish_date: date) -> PublishedProviderTrack | None:
         try:
             async with aiohttp.ClientSession() as session:
                 async with session.get(self.load_album_url) as response:
@@ -43,14 +44,14 @@ class YandexMusicProvider(PodcastProvider):
             track = album.get_track_published_in(publish_date)
             if not track:
                 return None
-            return ProviderTrack(
+            return YandexPublishedProviderTrack(
                 id=track.id,
-                name=track.title,
-                publication_date=track.publication_date,
+                title=track.title,
+                publish_date=track.publication_date,
                 description=track.short_description,
                 duration=track.duration,
                 source_url=self.create_source_url(track.id),
-                provider_info=YandexProviderInfo(id=track.id)
+                provider=self,
             )
         except ValidationError as validation_error:
             _logger.error('Ошибка при создании объекта альбома', exc_info=validation_error)
