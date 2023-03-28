@@ -4,12 +4,18 @@ create table podcasts(
     yc_album_id integer
 );
 
-create table yandex_music_published_tracks(
-    track_id integer primary key,
-    published_time timestamp not null
+create unique index PODCASTS_YC_ALBUM_ID on podcasts(yc_album_id);
+
+create table tracks(
+    id integer primary key autoincrement,
+    podcast_id integer references podcasts(id) not null,
+    tg_message_id integer not null,
+    publish_date timestamp not null,
+    yc_track_id integer
 );
 
-create index YANDEX_MUSIC_PUBLISHED_TRACKS_IDX on yandex_music_published_tracks(track_id);
+create unique index TRACKS_TG_MESSAGE_ID on tracks(tg_message_id);
+create unique index TRACKS_YC_TRACK_ID on tracks(yc_track_id);
 
 create table podcast_tag(
     podcast_id integer references podcasts(id) not null,

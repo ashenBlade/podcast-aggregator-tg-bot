@@ -1,18 +1,25 @@
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
 from datetime import date
 
-from models.provider_track import ProviderTrack
+from models.published_provider_track import PublishedProviderTrack
 
 
+@dataclass
 class PodcastProvider(ABC):
     @property
     @abstractmethod
-    def name(self):
-        ...
+    def name(self) -> str:
+        """
+        Название провайдера подкаста
+        """
 
     @abstractmethod
-    async def get_track_published_in_specified_date(self, publish_date: date) -> ProviderTrack | None:
+    async def get_track_published_at(self, publish_date: date) -> PublishedProviderTrack | None:
         """
-        Скачать трек подкаста, который был выложен в указанную дату (без времени).
-        Предполагается, что все треки от разных провайдеров, выпущенные в один день относятся к одному и тому же треку
+        Получить трек выпущенный в указанную дату
+        :param publish_date: Дата публикации трека
+        :return: Выпущенный трек или ничего
         """
+
+

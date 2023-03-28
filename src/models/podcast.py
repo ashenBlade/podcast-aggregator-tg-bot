@@ -1,10 +1,31 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import date, timedelta
 
 from models.podcast_provider import PodcastProvider
-from models.provider_track import ProviderTrack
-from models.track import Track
-from models.track_source import TrackSource
+from models.published_provider_track import PublishedProviderTrack
+
+from models.published_track import PublishedTrack
+
+
+def get_result_description(tracks: list[PublishedProviderTrack]):
+    longest_description = max((t.description for t in tracks), key=len)
+    return longest_description
+
+
+def get_result_duration(provider_tracks):
+    avg_seconds = (
+        sum(t.duration.total_seconds() for t in provider_tracks)
+        /
+        len(provider_tracks)
+    )
+    return timedelta(seconds=avg_seconds)
+
+
+def get_result_title(provider_tracks):
+    longest_title = max((
+        t.title for t in provider_tracks
+    ), key=len)
+    return longest_title
 
 
 @dataclass
@@ -12,57 +33,32 @@ class Podcast:
     id: int
     name: str
     providers: list[PodcastProvider]
-    tags: list[str] = field(default_factory=list)
+    tags: list[str]
 
-    async def get_track_created_in_specified_day(self, published_date: date) -> Track | None:
-        all_tracks: list[tuple[ProviderTrack, PodcastProvider]] = [
-            (track, provider)
-            for (track, provider)
+    async def get_track_published_at(self, publish_date: date) -> PublishedTrack | None:
+        provider_tracks: list[PublishedProviderTrack] = [
+            t
+            for t
             in [
-                (await provider.get_track_published_in_specified_date(published_date), provider)
-                for provider in self.providers
-            ] if track
-        ]
-        if not any(all_tracks):
-            return None
-
-        track_sources = [
-            TrackSource(
-                provider=provider,
-                url=track.source_url
-            )
-            for (track, provider)
-            in all_tracks
+                await p.get_track_published_at(publish_date)
+                for p
+                in self.providers
+            ] if t
         ]
 
-        average_duration_seconds = sum(
-            t.duration.total_seconds()
-            for (t, _)
-            in all_tracks
-        ) / len(all_tracks)
+        if not provider_tracks:
+            return
 
-        first_description = next(
-            (x.description for (x, _) in all_tracks if x.description),
-            ''
+        description = get_result_description(provider_tracks)
+        duration = get_result_duration(provider_tracks)
+        title = get_result_title(provider_tracks)
+
+        return PublishedTrack(
+            provider_tracks=provider_tracks,
+            description=description,
+            duration=duration,
+            title=title,
+            podcast=self,
+            tags=self.tags
         )
 
-        first_name = next(
-            (x.name for (x, _) in all_tracks if x.name),
-            ''
-        )
-
-        provider_infos = [
-            track.provider_info
-            for (track, provider)
-            in all_tracks
-        ]
-        return Track(
-            name=first_name,
-            duration=timedelta(seconds=average_duration_seconds),
-            description=first_description,
-            sources=track_sources,
-            publication_date=published_date,
-            tags=self.tags,
-            provider_infos=provider_infos,
-            podcast=self
-        )
