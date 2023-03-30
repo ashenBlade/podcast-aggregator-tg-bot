@@ -13,10 +13,19 @@ def get_result_description(tracks: list[PublishedProviderTrack]):
 
 
 def get_result_duration(provider_tracks):
+    total_durations = [
+        t.duration
+        for t in provider_tracks
+        if t.duration is not None
+    ]
+
+    if not total_durations:
+        return None
+
     avg_seconds = (
-        sum(t.duration.total_seconds() for t in provider_tracks)
+        sum(d.total_seconds() for d in total_durations)
         /
-        len(provider_tracks)
+        len(total_durations)
     )
     return timedelta(seconds=avg_seconds)
 

@@ -1,27 +1,37 @@
-import datetime
 import json
 import logging
 import sqlite3
-from datetime import datetime, date
+from datetime import datetime
 
 from models.podcast import Podcast
 from models.provider_track import ProviderTrack
 from models.published_track import PublishedTrack
 from models.saved_track import SavedTrack
 from podcast_providers import YandexMusicProvider
+from podcast_providers.google_podcasts_podcast_provider.google_podcasts_podcast_provider import \
+    GooglePodcastsPodcastProvider
+from podcast_providers.google_podcasts_podcast_provider.google_provider_track import GoogleProviderTrack
 from podcast_providers.yandex_podcast_provider.yandex_provider_track import YandexProviderTrack
 
 _logger = logging.getLogger(__name__)
 
 
 def parse_podcast_row(row: tuple):
-    id, name, tags_str, yc_album_id = row
-    providers = [YandexMusicProvider(album=yc_album_id)] if yc_album_id else []
+    id, name, tags_str, yc_album_id, gp_feed_id = row
+    providers = []
+    if yc_album_id:
+        providers.append(YandexMusicProvider(album=yc_album_id))
+
+    if gp_feed_id:
+        providers.append(GooglePodcastsPodcastProvider(feed=gp_feed_id))
+
+    tags = json.loads(tags_str) if tags_str else []
+
     return Podcast(
         id=id,
         name=name,
         providers=providers,
-        tags=json.loads(tags_str) if tags_str else []
+        tags=tags
     )
 
 
@@ -36,7 +46,7 @@ class SqlitePodcastManager:
             cursor = connection.execute(
                 'select p.id, p.name, ('
                 ' case count(t.id) when 0 then null else json_group_array(t.tag) end'
-                ') as tags, p.yc_album_id '
+                ') as tags, p.yc_album_id, p.gp_feed_id '
                 'from podcasts p '
                 'left join podcast_tag pt on p.id = pt.podcast_id '
                 'left join tags t on pt.tag_id = t.id '
@@ -81,7 +91,7 @@ class SqlitePodcastManager:
                     continue
 
                 row = cursor.execute((
-                    'select t.id, t.podcast_id, t.tg_message_id, t.yc_track_id '
+                    'select t.id, t.podcast_id, t.tg_message_id, t.yc_track_id, t.gp_episode_id '
                     'from tracks t '
                     'where t.id = ? '
                 ), (found_id,)).fetchone()
@@ -89,10 +99,10 @@ class SqlitePodcastManager:
                     _logger.warning('Провайдер %s вернул ID несуществующего трека', pt.provider.name)
                     continue
 
-                track_id, podcast_id, tg_message_id, yc_track_id = row
+                track_id, podcast_id, tg_message_id, yc_track_id, gp_episode_id = row
                 saved_provider_tracks = []
                 if yc_track_id:
-                    album_id = cursor.execute((
+                    album_id, = cursor.execute((
                         'select yc_album_id '
                         'from podcasts '
                         'where id = ?'
@@ -100,6 +110,17 @@ class SqlitePodcastManager:
                     saved_provider_tracks.append(YandexProviderTrack(
                         id=yc_track_id,
                         album_id=album_id
+                    ))
+
+                if gp_episode_id:
+                    gp_feed_id, = cursor.execute((
+                        'select gp_feed_id '
+                        'from podcasts '
+                        'where id = ?'
+                    ), (podcast_id,)).fetchone()
+                    saved_provider_tracks.append(GoogleProviderTrack(
+                        id=gp_episode_id,
+                        feed_id=gp_feed_id
                     ))
 
                 return SavedTrack(
