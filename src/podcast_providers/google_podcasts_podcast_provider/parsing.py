@@ -1,13 +1,22 @@
 import logging
 import re
 from datetime import datetime
+import warnings
 
 import dateparser
 from bs4 import BeautifulSoup, Tag
 
 from podcast_providers.google_podcasts_podcast_provider.models.page_published_track import PagePublishedTrack
 
+
 track_id_regex = re.compile(r'\./feed/\w+/episode/(\w+)\?.*')
+
+# https://github.com/scrapinghub/dateparser/issues/1013
+warnings.filterwarnings(
+    'ignore',
+    message='The localize method is no longer necessary, as this time zone supports the fold attribute'
+)
+
 relative_time = datetime.now()
 relative_time_settings = {'RELATIVE_BASE': relative_time}
 

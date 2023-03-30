@@ -8,8 +8,8 @@ from insfrastructure.app_settings import AppSettings
 from insfrastructure.name_track_pair import NameTrackPair
 from models.provider_track import ProviderTrack
 from models.published_track import PublishedTrack
-from services.podcast_manager.sqlite_podcast_manager.sqlite_podcast_manager import SqlitePodcastManager
-from services.track_sender.telegram_track_sender.telegram_track_sender import TelegramTrackSender
+from sqlite_podcast_manager.sqlite_podcast_manager import SqlitePodcastManager
+from telegram_track_sender.telegram_track_sender import TelegramTrackSender
 
 
 def get_app_settings():

@@ -5,7 +5,7 @@ from aiogram import Bot
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, ParseMode
 
 from models.track_source import TrackSource
-from services.track_sender.telegram_track_sender.track_formatter import format_track_markdown
+from telegram_track_sender.track_formatter import format_track_markdown
 
 
 _logger = logging.getLogger(__name__)
