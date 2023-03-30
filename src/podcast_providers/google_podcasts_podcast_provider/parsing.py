@@ -1,14 +1,11 @@
 import logging
+import re
 from datetime import datetime
 
 import dateparser
 from bs4 import BeautifulSoup, Tag
-import re
 
-from podcast_providers.google_podcasts_podcast_provider.google_published_provider_track import \
-    GooglePublishedProviderTrack
 from podcast_providers.google_podcasts_podcast_provider.models.page_published_track import PagePublishedTrack
-
 
 track_id_regex = re.compile(r'\./feed/\w+/episode/(\w+)\?.*')
 relative_time = datetime.now()
@@ -27,6 +24,7 @@ def _parse_duration(duration_tag: Tag):
     # Почему-то парсит время назад, а не вперед
     # Когда передается '1 hr 30 min' время откатывается назад, а не вперед, относительно relative_time
     parsed_date = dateparser.parse(duration, settings=relative_time_settings)
+
     return relative_time - parsed_date
 
 
@@ -48,12 +46,14 @@ def _extract_tags(top_level: Tag):
 
 
 def _parse_publish_date(publish_day_tag):
-    parsed_datetime = dateparser.parse(publish_day_tag.text)
+    # Неправильно парсит '1 day ago'
+    text = publish_day_tag.text
+    parsed_datetime = dateparser.parse(text)
     return parsed_datetime.date()
 
 
-def _parse_description(description_tag):
-    return description_tag.text
+def _parse_description(description_tag: Tag):
+    return description_tag.get_text(separator='\n')
 
 
 def _parse_title(title_tag):
@@ -71,11 +71,8 @@ def _parse_track(tag: Tag) -> PagePublishedTrack:
         publish_day_tag, title_tag, description_tag, duration_tag = list(tag.findNext('div').children)
 
         publish_date = _parse_publish_date(publish_day_tag)
-
         title = _parse_title(title_tag)
-
         description = _parse_description(description_tag)
-
         duration = _parse_duration(duration_tag)
 
         return PagePublishedTrack(
@@ -89,8 +86,8 @@ def _parse_track(tag: Tag) -> PagePublishedTrack:
         _logger.warning('Ошибка во время парсинга трека гугл подкастов', exc_info=e)
 
 
-def parse_google_published_tracks(body: str) -> list[PagePublishedTrack]:
-    soup = BeautifulSoup(body)
+def parse_google_published_tracks_ordered(body: str) -> list[PagePublishedTrack]:
+    soup = BeautifulSoup(body, 'lxml')
 
     # Вроде div с такими параметрами на странице только один...
     newest_tracks_section = soup.find('div', {'role': 'list'})
@@ -98,10 +95,10 @@ def parse_google_published_tracks(body: str) -> list[PagePublishedTrack]:
     # Все эпизоды располагаются внутри якоря
     tags = newest_tracks_section.findAll('a')
 
-    return [
+    return (
         t for t in (
             _parse_track(tag)
             for tag
             in tags
         ) if t
-    ]
+    )

@@ -41,5 +41,5 @@ class GooglePublishedProviderTrack(PublishedProviderTrack):
     async def check_saved(self, connection: Connection) -> bool:
         exists, = connection.execute((
             'select exists(select 1 from tracks where gp_episode_id = ?)'
-        ), (self.id,))
+        ), (self.id,)).fetchone()
         return bool(exists)

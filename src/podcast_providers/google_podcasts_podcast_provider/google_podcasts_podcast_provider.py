@@ -8,7 +8,7 @@ from models.published_provider_track import PublishedProviderTrack
 from podcast_providers.google_podcasts_podcast_provider import utils
 from podcast_providers.google_podcasts_podcast_provider.google_published_provider_track import \
     GooglePublishedProviderTrack
-from podcast_providers.google_podcasts_podcast_provider.parsing import parse_google_published_tracks
+from podcast_providers.google_podcasts_podcast_provider.parsing import parse_google_published_tracks_ordered
 
 
 @dataclass
@@ -23,8 +23,7 @@ class GooglePodcastsPodcastProvider(PodcastProvider):
         async with aiohttp.ClientSession() as session:
             async with session.get(utils.create_load_album_url(self.feed)) as response:
                 body = await response.text()
-                tracks = parse_google_published_tracks(body)
-                for track in tracks:
+                for track in parse_google_published_tracks_ordered(body):
                     if track.publish_date == publish_date:
                         return GooglePublishedProviderTrack(
                             id=track.episode_id,
@@ -36,4 +35,5 @@ class GooglePodcastsPodcastProvider(PodcastProvider):
                             source_url=utils.create_track_source_url(self.feed, track.episode_id),
                             feed_id=self.feed
                         )
-
+                    if track.publish_date < publish_date:
+                        return

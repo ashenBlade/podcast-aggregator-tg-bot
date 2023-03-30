@@ -8,7 +8,7 @@ from insfrastructure.app_settings import AppSettings
 from insfrastructure.name_track_pair import NameTrackPair
 from models.provider_track import ProviderTrack
 from models.published_track import PublishedTrack
-from services.podcast_repository.sqlite_podcast_repository.sqlite_podcast_manager import SqlitePodcastManager
+from services.podcast_manager.sqlite_podcast_manager.sqlite_podcast_manager import SqlitePodcastManager
 from services.track_sender.telegram_track_sender.telegram_track_sender import TelegramTrackSender
 
 
@@ -35,7 +35,8 @@ async def poll_for_tracks(sender: TelegramTrackSender, podcast_manager: SqlitePo
     try:
         podcasts = await podcast_manager.get_all_podcasts()
         _logger.debug('Загружено %i подкастов из БД', len(podcasts))
-        today = datetime.today().date()
+        # today = datetime.today().date()
+        today = datetime(2023, 3, 28).date()
         published_tracks: list[PublishedTrack] = [
             track for track in [
                 await podcast.get_track_published_at(today)
