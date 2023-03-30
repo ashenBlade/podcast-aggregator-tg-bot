@@ -2,10 +2,10 @@ import logging
 from datetime import timedelta
 
 from aiogram import Bot
-from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, ParseMode
 
 from models.track_source import TrackSource
-from services.track_sender.telegram_track_sender.track_formatter import format_track_markdown
+from telegram_track_sender.track_formatter import format_track_markdown
 
 
 _logger = logging.getLogger(__name__)
@@ -45,7 +45,7 @@ class TelegramTrackSender:
         message = await self.bot.send_message(
             self.chat_id,
             formatted_message,
-            parse_mode='Markdown',
+            parse_mode=ParseMode.HTML,
             reply_markup=keyboard
         )
         return message.message_id

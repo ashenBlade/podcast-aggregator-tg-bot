@@ -2,14 +2,15 @@ import asyncio
 import datetime
 import logging
 import os
+import time
 from datetime import timedelta, datetime
 
 from insfrastructure.app_settings import AppSettings
 from insfrastructure.name_track_pair import NameTrackPair
 from models.provider_track import ProviderTrack
 from models.published_track import PublishedTrack
-from services.podcast_repository.sqlite_podcast_repository.sqlite_podcast_manager import SqlitePodcastManager
-from services.track_sender.telegram_track_sender.telegram_track_sender import TelegramTrackSender
+from sqlite_podcast_manager.sqlite_podcast_manager import SqlitePodcastManager
+from telegram_track_sender.telegram_track_sender import TelegramTrackSender
 
 
 def get_app_settings():
@@ -50,9 +51,9 @@ async def poll_for_tracks(sender: TelegramTrackSender, podcast_manager: SqlitePo
         _logger.info('Обнаружено %i новых треков подкастов', len(published_tracks))
 
         for published_track in published_tracks:
-            _logger.info('Обрабатываю %s', published_track)
+            _logger.info('Обрабатываю эпизод "%s"', published_track.title)
             saved_track = await podcast_manager.try_find_saved_track(published_track)
-            if saved_track:  # Уже был отправлен
+            if saved_track:
                 _logger.debug('Трек уже был сохранен. Id = %i', saved_track.id)
                 result_provider_tracks: list[ProviderTrack] = [
                     x.track
