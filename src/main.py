@@ -2,6 +2,7 @@ import asyncio
 import datetime
 import logging
 import os
+import time
 from datetime import timedelta, datetime
 
 from insfrastructure.app_settings import AppSettings
@@ -35,8 +36,7 @@ async def poll_for_tracks(sender: TelegramTrackSender, podcast_manager: SqlitePo
     try:
         podcasts = await podcast_manager.get_all_podcasts()
         _logger.debug('Загружено %i подкастов из БД', len(podcasts))
-        # today = datetime.today().date()
-        today = datetime(2023, 3, 28).date()
+        today = datetime.today().date()
         published_tracks: list[PublishedTrack] = [
             track for track in [
                 await podcast.get_track_published_at(today)
@@ -51,9 +51,9 @@ async def poll_for_tracks(sender: TelegramTrackSender, podcast_manager: SqlitePo
         _logger.info('Обнаружено %i новых треков подкастов', len(published_tracks))
 
         for published_track in published_tracks:
-            _logger.info('Обрабатываю %s', published_track)
+            _logger.info('Обрабатываю эпизод "%s"', published_track.title)
             saved_track = await podcast_manager.try_find_saved_track(published_track)
-            if saved_track:  # Уже был отправлен
+            if saved_track:
                 _logger.debug('Трек уже был сохранен. Id = %i', saved_track.id)
                 result_provider_tracks: list[ProviderTrack] = [
                     x.track
