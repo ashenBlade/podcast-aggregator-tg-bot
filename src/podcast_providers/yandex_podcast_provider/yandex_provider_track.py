@@ -12,6 +12,8 @@ _logger = logging.getLogger(__name__)
 
 @dataclass
 class YandexProviderTrack(ProviderTrack):
+    album_id: int
+
     async def check_saved(self, connection: Connection) -> bool:
         exists, = connection.execute((
             'select exists(select 1 from tracks where yc_track_id = ?)'
@@ -21,8 +23,6 @@ class YandexProviderTrack(ProviderTrack):
     @property
     def provider_name(self) -> str:
         return constants.PROVIDER_NAME
-
-    album_id: int
 
     async def save_track(self, track_id: int, connection: Connection):
         cursor = connection.execute((

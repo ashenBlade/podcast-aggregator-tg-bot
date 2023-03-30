@@ -33,6 +33,7 @@ class GooglePodcastsPodcastProvider(PodcastProvider):
                             duration=track.duration,
                             description=track.description,
                             provider=self,
-                            source_url=utils.create_track_source_url(self.feed, track.episode_id)
+                            source_url=utils.create_track_source_url(self.feed, track.episode_id),
+                            feed_id=self.feed
                         )
 
