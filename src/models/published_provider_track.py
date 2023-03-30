@@ -14,7 +14,7 @@ from models.provider_track import ProviderTrack
 class PublishedProviderTrack(ProviderTrack, ABC):
     title: str
     description: str
-    duration: timedelta
+    duration: timedelta | None
     source_url: str
     publish_date: date
     provider: 'PodcastProvider'

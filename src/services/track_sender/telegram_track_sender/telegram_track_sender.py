@@ -41,7 +41,6 @@ class TelegramTrackSender:
                          track_sources: list[TrackSource],
                          tags: list[str]):
         formatted_message = format_track_markdown(title, description, podcast, duration, tags)
-        print(formatted_message)
         keyboard = create_reply_source_url_keyboard(track_sources)
         message = await self.bot.send_message(
             self.chat_id,

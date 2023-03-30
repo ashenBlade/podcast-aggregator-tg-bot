@@ -19,11 +19,19 @@ def _parse_track_id(tag: Tag):
 
 def _parse_duration(duration_tag: Tag):
     # В последнем тэге есть 2 div'а, причем текст в первом - сама длительность
-    duration = duration_tag.div.text
+    duration_text: str = duration_tag.div.text
+
+    # Длительность некоторых не указана
+    if not duration_text or duration_text.isspace():
+        return None
 
     # Почему-то парсит время назад, а не вперед
     # Когда передается '1 hr 30 min' время откатывается назад, а не вперед, относительно relative_time
-    parsed_date = dateparser.parse(duration, settings=relative_time_settings)
+    parsed_date = dateparser.parse(duration_text, settings=relative_time_settings)
+
+    # Может ли быть так?
+    if parsed_date is None:
+        return None
 
     return relative_time - parsed_date
 

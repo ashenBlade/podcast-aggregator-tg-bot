@@ -26,10 +26,14 @@ def format_tags(tags: list[str], podcast: str):
     )
 
 
-def format_track_markdown(title: str, description: str, podcast: str, duration: timedelta, tags: list[str]):
-    return fmt.text(
-        fmt.hbold(fmt.quote_html(title)), '\n\n',
-        fmt.quote_html(description), '\n\n',
-        'Длительность: ', format_duration(duration), '\n\n',
-        fmt.text(*format_tags(tags, podcast)), '\n\n'
-    )
+def format_track_markdown(title: str, description: str, podcast: str, duration: timedelta | None, tags: list[str]):
+    sections = [
+        fmt.hbold(fmt.quote_html(title)),
+        fmt.quote_html(description)
+    ]
+
+    if duration:
+        sections.append(f'Длительность: {format_duration(duration)}')
+
+    sections.append(' '.join(format_tags(tags, podcast)))
+    return '\n\n'.join(sections)
