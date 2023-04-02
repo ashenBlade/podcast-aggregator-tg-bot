@@ -2,8 +2,9 @@ import html
 import itertools
 from datetime import datetime, timedelta
 
-import aiogram.utils.markdown
 from aiogram.utils import markdown as fmt
+
+from insfrastructure.utils import to_hashtag
 
 
 def format_duration(duration: timedelta):
@@ -16,13 +17,13 @@ def format_duration(duration: timedelta):
         return f'{minutes}м'
 
 
-def format_tags(tags: list[str], podcast: str):
-    podcast_name_tag = podcast.replace(' ', '')
-    tags = tags or tuple()
+def format_tags(tags: list[str], podcast_name: str):
+    podcast_name_hashtag = to_hashtag(podcast_name)
+    podcast_name_tuple = (podcast_name_hashtag,) if podcast_name_hashtag else tuple()
     return (
         f'#{tag}'
         for tag
-        in itertools.chain(tags, (podcast_name_tag,))
+        in itertools.chain(tags or tuple(), podcast_name_tuple)
     )
 
 
