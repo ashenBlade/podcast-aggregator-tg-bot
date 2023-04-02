@@ -6,4 +6,6 @@ RUN pip install -r requirements.txt
 
 COPY src/ .
 
+ENV TZ=Europe/Moscow
+
 ENTRYPOINT ["python", "main.py"]
