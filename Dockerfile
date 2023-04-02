@@ -7,5 +7,6 @@ RUN pip install -r requirements.txt
 COPY src/ .
 
 ENV TZ=Europe/Moscow
+RUN apk add --no-cache tzdata
 
 ENTRYPOINT ["python", "main.py"]
