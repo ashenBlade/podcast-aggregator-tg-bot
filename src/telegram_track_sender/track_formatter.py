@@ -17,6 +17,15 @@ def format_duration(duration: timedelta):
         return f'{minutes}м'
 
 
+def pre_process_description(description: str, max_length: int) -> str:
+    paragraphs = description.strip().split('\n\n')
+    if not paragraphs:
+        return ''
+
+    first_paragraph = paragraphs[0]
+    return first_paragraph[:max_length] + ('...' if len(first_paragraph) > max_length else '')
+
+
 def format_tags(tags: list[str], podcast_name: str):
     podcast_name_hashtag = to_hashtag(podcast_name)
     podcast_name_tuple = (podcast_name_hashtag,) if podcast_name_hashtag else tuple()
@@ -27,10 +36,13 @@ def format_tags(tags: list[str], podcast_name: str):
     )
 
 
+max_description_length = 500
+
+
 def format_track_markdown(title: str, description: str, podcast: str, duration: timedelta | None, tags: list[str]):
     sections = [
         fmt.hbold(fmt.quote_html(title)),
-        fmt.quote_html(description)
+        fmt.quote_html(pre_process_description(description, max_description_length))
     ]
 
     if duration:
