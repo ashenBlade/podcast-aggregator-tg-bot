@@ -11,7 +11,7 @@ from podcast_providers.apple_podcasts_provider.apple_published_provider_track im
 
 @dataclass
 class ApplePodcastsProvider(PodcastProvider):
-    id: str
+    podcast_id: str
 
     @property
     def name(self) -> str:
@@ -19,7 +19,7 @@ class ApplePodcastsProvider(PodcastProvider):
 
     async def get_track_published_at(self, publish_date: date) -> PublishedProviderTrack | None:
         async with aiohttp.ClientSession() as session:
-            async with session.get(utils.format_load_podcast_page_url(self.id)) as response:
+            async with session.get(utils.format_load_podcast_page_url(self.podcast_id)) as response:
                 body = await response.text()
                 for track in parsing.parse_published_tracks_ordered(body):
                     if track.publish_date == publish_date:
@@ -30,8 +30,8 @@ class ApplePodcastsProvider(PodcastProvider):
                             duration=track.duration,
                             description=track.description,
                             title=track.title,
-                            source_url=utils.format_source_url(self.id, track.id),
-                            podcast_id=self.id
+                            source_url=utils.format_source_url(self.podcast_id, track.id),
+                            podcast_id=self.podcast_id
                         )
                     if track.publish_date < publish_date:
                         return
