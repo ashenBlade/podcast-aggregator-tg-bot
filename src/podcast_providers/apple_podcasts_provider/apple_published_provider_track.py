@@ -24,15 +24,11 @@ class ApplePublishedProviderTrack(PublishedProviderTrack):
         return utils.PROVIDER_NAME
 
     async def save_track(self, track_id: int, connection: Connection):
-        cursor = connection.cursor()
-        try:
-            cursor.execute((
-                'update tracks '
-                'set ap_track_id = ? '
-                'where id = ?'
-            ), (self.id, track_id))
-        finally:
-            cursor.close()
+        connection.execute((
+            'update tracks '
+            'set ap_track_id = ? '
+            'where id = ?'
+        ), (self.id, track_id))
 
     def create_track_source(self) -> TrackSource:
         return TrackSource(

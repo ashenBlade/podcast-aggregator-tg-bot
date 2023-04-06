@@ -86,6 +86,7 @@ class SqlitePodcastManager:
                 return track_id
             except:
                 cursor.execute('rollback')
+                raise
 
     async def try_find_saved_track(self, track: PublishedTrack) -> SavedTrack | None:
         with sqlite3.connect(self.database) as connection:
