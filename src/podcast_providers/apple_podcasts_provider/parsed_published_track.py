@@ -9,4 +9,3 @@ class ParsedPublishedTrack:
     description: str
     duration: timedelta | None
     publish_date: date
-
