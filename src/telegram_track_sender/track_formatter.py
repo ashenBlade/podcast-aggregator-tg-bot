@@ -32,7 +32,7 @@ def format_tags(tags: list[str], podcast_name: str):
     )
 
 
-MAX_TELEGRAM_DESCRIPTION_LENGTH = 300
+MAX_TELEGRAM_DESCRIPTION_LENGTH = 450
 
 
 def format_track_markdown(title: str, description: str, podcast: str, duration: timedelta | None, tags: list[str]):
