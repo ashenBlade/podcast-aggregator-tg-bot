@@ -7,9 +7,28 @@ from models.published_provider_track import PublishedProviderTrack
 from models.published_track import PublishedTrack
 
 
+def format_description(description: str, min_description_length: int):
+    sections = [
+        section.strip()
+        for section
+        in description.split('\n\n')
+    ]
+    filtered = []
+
+    for section in sections:
+        filtered.append(section)
+        min_description_length -= len(section)
+        if min_description_length <= 0:
+            break
+
+    return '\n\n'.join(filtered)
+
+
+DEFAULT_MIN_DESCRIPTION_LENGTH = 200
+
+
 def get_result_description(tracks: list[PublishedProviderTrack]):
-    longest_description = max((t.description for t in tracks), key=len)
-    return longest_description
+    return format_description(max((t.description for t in tracks), key=len), DEFAULT_MIN_DESCRIPTION_LENGTH)
 
 
 def get_result_duration(provider_tracks):
