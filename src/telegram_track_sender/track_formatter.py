@@ -1,6 +1,5 @@
-import html
 import itertools
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 from aiogram.utils import markdown as fmt
 

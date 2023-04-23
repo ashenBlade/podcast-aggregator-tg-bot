@@ -7,7 +7,6 @@ from models.published_provider_track import PublishedProviderTrack
 from models.published_track import PublishedTrack
 
 
-
 def format_description(description: str, min_description_length: int):
     sections = [
         section.strip()

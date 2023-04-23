@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from datetime import timedelta, datetime, date
+from datetime import timedelta, date
 
 
 @dataclass

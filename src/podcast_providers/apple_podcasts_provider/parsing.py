@@ -1,6 +1,5 @@
-from urllib.parse import urlparse, parse_qs
 from datetime import datetime
-from typing import Generator
+from urllib.parse import urlparse, parse_qs
 
 import dateparser
 from bs4 import Tag, BeautifulSoup
