@@ -17,12 +17,9 @@ def format_duration(duration: timedelta):
 
 
 def pre_process_description(description: str, max_length: int) -> str:
-    paragraphs = description.strip().split('\n\n')
-    if not paragraphs:
-        return ''
-
-    first_paragraph = paragraphs[0]
-    return first_paragraph[:max_length] + ('...' if len(first_paragraph) > max_length else '')
+    if len(description) < max_length:
+        return description
+    return description[:max_length] + '...'
 
 
 def format_tags(tags: list[str], podcast_name: str):
@@ -35,13 +32,13 @@ def format_tags(tags: list[str], podcast_name: str):
     )
 
 
-max_description_length = 500
+MAX_TELEGRAM_DESCRIPTION_LENGTH = 300
 
 
 def format_track_markdown(title: str, description: str, podcast: str, duration: timedelta | None, tags: list[str]):
     sections = [
         fmt.hbold(fmt.quote_html(title)),
-        fmt.quote_html(pre_process_description(description, max_description_length))
+        fmt.quote_html(pre_process_description(description, MAX_TELEGRAM_DESCRIPTION_LENGTH))
     ]
 
     if duration:
