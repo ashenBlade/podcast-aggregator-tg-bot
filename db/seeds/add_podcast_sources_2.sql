@@ -17,6 +17,7 @@ values
 ('Flutter Dev Podcast', '11609672', 'aHR0cHM6Ly9mZWVkcy5zb3VuZGNsb3VkLmNvbS91c2Vycy9zb3VuZGNsb3VkOnVzZXJzOjU3OTM1NTM4My9zb3VuZHMucnNz', 'id1451068853'),
 ('Mobile People Talks', '9647763', 'aHR0cHM6Ly9mZWVkcy5zb3VuZGNsb3VkLmNvbS91c2Vycy9zb3VuZGNsb3VkOnVzZXJzOjYwNzU5Mzg4Mi9zb3VuZHMucnNz', 'id1457942497'),
 ('Appbooster', null, null, 'id1481440666'),
-('#DroiderCast', '9048349', 'aHR0cHM6Ly9wb2RzdGVyLmZtL3Jzcy54bWw_cGlkPTQxOTcx', 'id1057019371');
+('#DroiderCast', '9048349', 'aHR0cHM6Ly9wb2RzdGVyLmZtL3Jzcy54bWw_cGlkPTQxOTcx', 'id1057019371'),
+('Из бэклога', '25334501', 'aHR0cHM6Ly9jbG91ZC5tYXZlLmRpZ2l0YWwvNDQwNzQ', 'id1681257958');
  
 commit;
