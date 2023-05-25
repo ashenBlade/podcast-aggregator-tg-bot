@@ -8,7 +8,7 @@ class Track(BaseModel):
     title: str
     publication_date: date = Field(alias='pubDate')
     duration_ms: int = Field(alias='durationMs')
-    short_description: str = Field(alias='shortDescription')
+    short_description: str = Field(alias='shortDescription', default='')
 
     @property
     def duration(self) -> timedelta:
