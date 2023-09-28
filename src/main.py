@@ -44,11 +44,18 @@ def get_app_settings():
 
     yaml_file = os.environ.get('SEED_PODCASTS_FILE', None)
 
+    default_database_file = 'podcasts.sqlite'
+
+    database_file = os.environ.get('DB_FILE', None)
+    if not database_file:
+        _logger.info('Файл базы данных не указан. Использую %s', default_database_file)
+        database_file = default_database_file
+
     return AppSettings(
         poll_interval=poll_interval,
         token=token,
         chat_id=chat_id,
-        database_file='podcasts.sqlite',
+        database_file=database_file,
         seed_podcasts_yaml_file=yaml_file
     )
 
