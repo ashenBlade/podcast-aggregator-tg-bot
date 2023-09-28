@@ -13,23 +13,41 @@ from sqlite_podcast_manager.sqlite_podcast_manager import SqlitePodcastManager
 from telegram_track_sender.telegram_track_sender import TelegramTrackSender
 
 
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.DEBUG)
+_logger = logging.getLogger(__name__)
+
+
 def get_app_settings():
-    hours = int(os.environ['POLL_INTERVAL_HOURS'])
+    try:
+        hours = int(os.environ['POLL_INTERVAL_HOURS'])
+    except KeyError:
+        _logger.info("Значение интервала обновления не указано. Выставляю %i часов", 1)
+        hours = 1
+
+    if hours < 1:
+        raise ValueError('Интервал работы должен быть положительным. Передано %i', hours)
+
     poll_interval = timedelta(hours=hours)
-    token = os.environ['BOT_TOKEN']
-    chat_id = int(os.environ['CHAT_ID'])
-    db_file = os.environ['DB_FILE']
+
+    try:
+        token = os.environ['BOT_TOKEN']
+    except KeyError:
+        token = None
+
+    if not token:
+        raise ValueError('В BOT_TOKEN не указан токен бота')
+
+    try:
+        chat_id = int(os.environ['CHAT_ID'])
+    except (KeyError, ValueError):
+        raise ValueError('Не удалось получить ID чата из переменной CHAT_ID')
 
     return AppSettings(
         poll_interval=poll_interval,
         token=token,
         chat_id=chat_id,
-        database_file=db_file
+        database_file='podcasts.sqlite'
     )
-
-
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.DEBUG)
-_logger = logging.getLogger(__name__)
 
 
 async def poll_for_tracks(sender: TelegramTrackSender, podcast_manager: SqlitePodcastManager):
@@ -123,7 +141,12 @@ async def poll_for_tracks(sender: TelegramTrackSender, podcast_manager: SqlitePo
 
 
 async def main():
-    settings = get_app_settings()
+    try:
+        settings = get_app_settings()
+    except ValueError as ve:
+        _logger.critical('Ошибка при получении конфигурации', exc_info=ve)
+        return
+
     podcast_manager = SqlitePodcastManager(
         database=settings.database_file
     )
@@ -131,6 +154,9 @@ async def main():
         token=settings.token,
         chat_id=settings.chat_id,
     )
+
+    podcast_manager.create_database()
+
     _logger.info('Работа приложения начинается')
     while True:
         try:

@@ -46,6 +46,45 @@ class SqlitePodcastManager:
     def __init__(self, database: str):
         self.database = database
 
+    def create_database(self):
+        """
+        Инициализировать схему БД
+        """
+        cursor: sqlite3.Cursor
+        with sqlite3.connect(self.database) as connection:
+            with connection.cursor() as cursor:
+                try:
+                    _logger.info('Начинаю создание схемы БД')
+                    cursor.executescript('''
+begin;
+create table podcasts(
+    id integer primary key autoincrement,
+    name varchar not null,
+    yc_album_id integer,
+    gp_feed_id varchar null,
+    ap_podcast_id varchar
+);
+
+create unique index PODCASTS_YC_ALBUM_ID on podcasts(yc_album_id);
+
+create table tracks(
+    id integer primary key autoincrement,
+    podcast_id integer references podcasts(id) not null,
+    tg_message_id integer not null,
+    publish_date timestamp not null,
+    yc_track_id integer,
+    ap_track_id integer null,
+    gp_episode_id varchar
+);
+
+create unique index TRACKS_TG_MESSAGE_ID on tracks(tg_message_id);
+create unique index TRACKS_YC_TRACK_ID on tracks(yc_track_id);
+commit;
+''')
+                    _logger.info("База данных инициализирована")
+                except sqlite3.OperationalError as oe:
+                    _logger.info("База данных уже инициализирована", exc_info=oe)
+
     async def get_all_podcasts(self) -> list[Podcast]:
         with sqlite3.connect(self.database) as connection:
             cursor = connection.execute(
