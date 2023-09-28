@@ -8,6 +8,10 @@ from models.track_source import TrackSource
 
 @dataclass
 class ProviderTrack(ABC):
+    """
+    Трек, выпущенный конкретным провайдером.
+    Используется при загрузке из БД
+    """
     id: Any
 
     @property

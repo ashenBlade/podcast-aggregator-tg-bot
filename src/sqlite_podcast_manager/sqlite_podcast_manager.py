@@ -225,6 +225,12 @@ commit;
                 raise e
 
     async def all_provider_track_saved(self, provider_tracks: list[ProviderTrack]):
+        """
+        Сделать проверку, что все треки уже есть в БД.
+        Это нужно при обновлении источников для сообщения
+        :param provider_tracks: Треки провайдеров
+        :return: True, если все треки уже есть в БД (указаны в ссылках сообщения), иначе False
+        """
         with sqlite3.connect(self.database) as connection:
             cursor = connection.cursor()
             for pt in provider_tracks:

@@ -7,6 +7,11 @@ from models.published_provider_track import PublishedProviderTrack
 
 @dataclass
 class PodcastProvider(ABC):
+    """
+    Провайдер треков для подкаста.
+    Например, Яндекс.Музыка, Гугл подкасты, Apple Подкасты
+    """
+
     @property
     @abstractmethod
     def name(self) -> str:

@@ -12,6 +12,9 @@ from models.provider_track import ProviderTrack
 
 @dataclass
 class PublishedProviderTrack(ProviderTrack, ABC):
+    """
+    Трек подкаста конкретного провайдера, загруженный из сети
+    """
     title: str
     description: str
     duration: timedelta | None

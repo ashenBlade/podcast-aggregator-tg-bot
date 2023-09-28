@@ -3,6 +3,10 @@ from dataclasses import dataclass
 
 @dataclass
 class TrackSource:
+    """
+    Пара (провайдер, адрес трека).
+    Используется для передачи списка источников в телеграм сообщение (внизу ссылки которые)
+    """
     name: str
     url: str
 

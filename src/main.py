@@ -4,6 +4,11 @@ import logging
 import os
 from datetime import timedelta, datetime
 
+
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.DEBUG)
+logging.getLogger('charset_normalizer').setLevel(logging.INFO)
+
+
 from infrastructure.app_settings import AppSettings
 from infrastructure.name_track_pair import NameTrackPair
 from models.provider_track import ProviderTrack
@@ -13,7 +18,6 @@ from telegram_track_sender.telegram_track_sender import TelegramTrackSender
 from infrastructure.yaml_podcasts_loader import load_podcasts_info
 
 
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.DEBUG)
 _logger = logging.getLogger(__name__)
 
 
@@ -64,7 +68,11 @@ async def poll_for_tracks(sender: TelegramTrackSender, podcast_manager: SqlitePo
     try:
         podcasts = await podcast_manager.get_all_podcasts()
         _logger.debug('Загружено %i подкастов из БД', len(podcasts))
+
+        # Берем текущую дату
         today = datetime.today().date()
+
+        # Загружаем все треки, выпущенные сегодня
         published_tracks: list[PublishedTrack] = [
             track for track in [
                 await podcast.get_track_published_at(today)
@@ -72,6 +80,7 @@ async def poll_for_tracks(sender: TelegramTrackSender, podcast_manager: SqlitePo
                 in podcasts
             ] if track
         ]
+
         if not published_tracks:
             _logger.info('Новых треков не обнаружено')
             return
@@ -80,24 +89,32 @@ async def poll_for_tracks(sender: TelegramTrackSender, podcast_manager: SqlitePo
 
         for published_track in published_tracks:
             _logger.info('Обрабатываю эпизод "%s"', published_track.title)
+
+            # Проверим, что этот трек уже обрабатывали
             saved_track = await podcast_manager.try_find_saved_track(published_track)
             if saved_track:
                 _logger.debug('Трек уже был сохранен. Id = %i', saved_track.id)
+
+                # Получаем результирующий список всех источников: новых и старых
                 result_provider_tracks: list[ProviderTrack] = [
                     x.track
                     for x
+                    # Создаем множество из всех опубликованных треков.
+                    # Используется сравнение по названию провайдера для исключения дубликатов
                     in sorted({
                         *(NameTrackPair(track=spt) for spt in saved_track.saved_provider_tracks),
                         *(NameTrackPair(track=pt) for pt in published_track.provider_tracks)
                     })
                 ]
 
+                # Проверяем, что появились новые источники
                 if await podcast_manager.all_provider_track_saved(result_provider_tracks):
                     _logger.debug('Для эпизода %i не нашлось новых треков от других провайдеров', saved_track.id)
                     continue
 
                 _logger.info('Для трека %i найдено %i треков провайдеров', saved_track.id, len(result_provider_tracks))
 
+                # Формируем список источников трека
                 result_track_sources = [
                     pt.create_track_source()
                     for pt
@@ -105,20 +122,25 @@ async def poll_for_tracks(sender: TelegramTrackSender, podcast_manager: SqlitePo
                 ]
 
                 try:
+                    # Обновляем источники трека подкаста в сообщении
                     await sender.update_track_sources(saved_track.tg_message_id, result_track_sources)
                     _logger.info('Кнопки для трека %i обновлены', saved_track.id)
                 except Exception as e:
                     _logger.error('Ошибка во время обновления кнопок ссылок для сообщения %i трека %i в телеграмме',
                                   saved_track.tg_message_id, saved_track.id, exc_info=e)
                     continue
+
                 try:
+                    # Добавляем в БД источники трека
                     await podcast_manager.update_tracks(saved_track.id, result_provider_tracks)
                     _logger.info('Трек %i обновлен', saved_track.id)
                 except Exception as e:
                     _logger.error('Ошибка во время обновления БД для трека %i', saved_track.id, exc_info=e)
                     continue
+
             else:  # Полностью новый
                 try:
+                    # Отправляем новое сообщение и получаем его ID
                     message_id = await sender.send_track(
                         published_track.title,
                         published_track.description,
@@ -134,6 +156,7 @@ async def poll_for_tracks(sender: TelegramTrackSender, podcast_manager: SqlitePo
                     continue
 
                 try:
+                    # Сохраняем сообщение в БД с указанием его источников
                     track_id = await podcast_manager.save_new_track(
                         message_id,
                         published_track.podcast.id,
