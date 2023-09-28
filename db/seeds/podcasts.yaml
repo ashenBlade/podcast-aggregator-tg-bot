@@ -1,0 +1,155 @@
+podcasts:
+- apple: id1209828744
+  google: aHR0cHM6Ly9mZWVkcy5zb3VuZGNsb3VkLmNvbS91c2Vycy9zb3VuZGNsb3VkOnVzZXJzOjI5MTMzNzEwNi9zb3VuZHMucnNz
+  name: Podlodka Podcast
+  yandex: 7570122
+- apple: id890468606
+  google: aHR0cHM6Ly9zZGNhc3Qua3NkYWVtb24ucnUvZmVlZC9wb2RjYXN0Lw
+  name: SDCast
+  yandex: 6880277
+- apple: id1492086611
+  google: aHR0cHM6Ly9hbmNob3IuZm0vcy8xMTc2MzUwYy9wb2RjYXN0L3Jzcw
+  name: Войти в IT
+  yandex: 9545891
+- apple: id1449804780
+  google: aHR0cHM6Ly9wb2RjYXN0Lml0YmVhcmQuY29tL2ZlZWQueG1s
+  name: АйТиБорода
+  yandex: 10589794
+- apple: id1466243923
+  google: aHR0cHM6Ly9jbG91ZC5tYXZlLmRpZ2l0YWwvMzI2NjM
+  name: Сушите вёсла
+  yandex: 9303111
+- apple: id256504435
+  google: aHR0cDovL2ZlZWRzLnJ1Y2FzdC5uZXQvcmFkaW8tdA
+  name: Радио-Т
+  yandex: 6411645
+- apple: id526797445
+  google: aHR0cHM6Ly9yYWRpb21hLm9yZy9mZWVkL3BvZGNhc3Q
+  name: Развлекательный IT-подкаст «Радиома»
+  yandex: 6880183
+- apple: id1488527416
+  google: aHR0cHM6Ly9hbmNob3IuZm0vcy8xMDdhMDI4Yy9wb2RjYXN0L3Jzcw
+  name: ПИЛИМ, ТРЁМ
+  yandex: 9502810
+- apple: id1488945593
+  google: aHR0cHM6Ly96YXB1c2t6YXZ0cmEubGlic3luLmNvbS9yc3M
+  name: Запуск Завтра
+  yandex: 9294155
+- apple: id1436711112
+  google: aHR0cHM6Ly9jbG91ZC5tYXZlLmRpZ2l0YWwvMzQ3MjY
+  name: ForGeeks Podcast
+  yandex: 7560675
+- apple: id1511253284
+  google: aHR0cHM6Ly9hbmNob3IuZm0vcy8xZTlhZTQwOC9wb2RjYXN0L3Jzcw==
+  name: FrontoWeek
+  yandex: 13794046
+- apple: id1068329384
+  google: aHR0cHM6Ly9mZWVkcy5wb2RjYXN0bWlycm9yLmNvbS96YXZ0cmFjYXN0
+  name: Завтракаст
+  yandex: 6411314
+- apple: id1162673070
+  google: aHR0cHM6Ly9wY3IuYXBwbGUuY29tL2lkMTE2MjY3MzA3MA
+  name: Мысли и методы
+  yandex: 6408500
+- apple: id1233996390
+  google: aHR0cHM6Ly9mZWVkcy5mZWVkYnVybmVyLmNvbS9mcm9udGVuZHdlZWtlbmQ
+  name: Frontend Weekend
+  yandex: 6842995
+- apple: id1080500016
+  google: aHR0cHM6Ly93ZWItc3RhbmRhcmRzLnJ1L3BvZGNhc3QvZmVlZC8
+  name: Веб-Стандарты
+  yandex: 6245956
+- apple: id1046278525
+  google: aHR0cHM6Ly9mZWVkLnBvZGJlYW4uY29tL3RoZWFydG9mcHJvZ3JhbW1pbmcvZmVlZC54bWw
+  name: The Art Of Programming
+  yandex: 6883832
+- apple: id1580755362
+  google: aHR0cHM6Ly9jbG91ZC5tYXZlLmRpZ2l0YWwvMzM2NDg
+  name: 'Релиз в пятницу'
+  yandex: 17437441
+- apple: id1065445951
+  google: aHR0cHM6Ly9saW5rbWV1cC5ydS9wb2RjYXN0cy9mZWVkLw
+  name: Linkmeup
+  yandex: 7060168
+- apple: id560881209
+  google: aHR0cHM6Ly9mZWVkcy5mZWVkYnVybmVyLmNvbS9HYWx5b25raW4tcG9k
+  name: Как делают игры
+  yandex: 8853948
+- apple: id1429543935
+  google: aHR0cHM6Ly9mZWVkLnBvZGJlYW4uY29tL2xlYXJucHl0aG9uL2ZlZWQueG1s
+  name: Moscow Python
+  yandex: 6892837
+- apple: id1490305221
+  google: aHR0cHM6Ly9hcGkucG9kY2FjaGUubmV0L3Nob3dzLzVhNTFjYTBiLWM5MzAtNDgwYS04NWY0LTk0YTVmMjE5MDUzMC9mZWVk
+  name: IT Way Podcast
+  yandex: 9442601
+- apple: id594292319
+  google: aHR0cHM6Ly9mZWVkcy5wb2RjYXN0bWlycm9yLmNvbS9yYXpib3Jwb2xldG92
+  name: Разбор полётов
+  yandex: 6880225
+- apple: id1484348948
+  google: aHR0cHM6Ly9jbG91ZC5tYXZlLmRpZ2l0YWwvMzcxNjc
+  name: DotNet & More
+  yandex: 12041961
+- apple: id923355344
+  google: aHR0cHM6Ly91d2ViZGVzaWduLnJ1L2ZlZWQvcG9kY2FzdC8
+  name: Суровый веб
+  yandex: 6410757
+- apple: id1489980299
+  google: aHR0cHM6Ly9mZWVkcy5zb3VuZGNsb3VkLmNvbS91c2Vycy9zb3VuZGNsb3VkOnVzZXJzOjcwMjAxODY3Ny9zb3VuZHMucnNz
+  name: Generic talks
+  yandex: 9937786
+- apple: id1458311254
+  google: aHR0cHM6Ly9mZWVkcy5zb3VuZGNsb3VkLmNvbS91c2Vycy9zb3VuZGNsb3VkOnVzZXJzOjYxMDU4MjU1Ny9zb3VuZHMucnNz
+  name: Цинковый прод
+  yandex: 9649473
+- apple: id1447645563
+  google: aHR0cDovL2ZlZWRzLmZlZWRidXJuZXIuY29tL2JlZWdlYm90L3Ntaw
+  name: Сделайте мне красиво
+  yandex: 6880172
+- apple: id1531586151
+  google: aHR0cDovL3Jzcy5jYXN0Ym94LmZtL2V2ZXJlc3QvMWJjYzI5ZjdjYTkwNDI4Yzg3NmUzZDc1NTAwMTg0YzEueG1s
+  name: ПроUI 5
+  yandex: 12115451
+- apple: id1502639464
+  google: aHR0cHM6Ly9mZWVkLnBvZGJlYW4uY29tL2Rldm9wc2tpdGNoZW50YWxrcy9mZWVkLnhtbA
+  name: The DevOps Kitchen Talks's Podcast
+  yandex: 10151746
+- apple: id1289965366
+  google: aHR0cHM6Ly9iYXNpY2Jsb2NrcmFkaW8ubGlic3luLmNvbS9yc3M
+  name: 'Базовый Блок: подкаст про блокчейн'
+  yandex: 7638583
+- apple: id1438708331
+  google: aHR0cHM6Ly9wb2RzdGVyLmZtL3Jzcy54bWw_cGlkPTYxNjA3
+  name: Игрожоры
+  yandex: 6965497
+- apple: id1076856310
+  google: aHR0cHM6Ly9hcHB0cmFjdG9yLnJ1L1BvZGNhc3QvYW5kcm9pZC54bWw
+  name: Android Dev подкаст
+  yandex: 6880291
+- apple: id1608801519
+  google: aHR0cHM6Ly9zZXJ2ZXIuZGV2ZWxvZy5vcmcvZmVlZC9wb2RjYXN0L3Jzcy54bWw
+  name: develog
+  yandex: 21184849
+- apple: id1448111173
+  google: aHR0cHM6Ly9mZWVkcy5zb3VuZGNsb3VkLmNvbS91c2Vycy9zb3VuZGNsb3VkOnVzZXJzOjIwNTQxMjEwOS9zb3VuZHMucnNz
+  name: DotNet & More
+  yandex: 18268100
+- apple: id1451068853
+  google: aHR0cHM6Ly9mZWVkcy5zb3VuZGNsb3VkLmNvbS91c2Vycy9zb3VuZGNsb3VkOnVzZXJzOjU3OTM1NTM4My9zb3VuZHMucnNz
+  name: Flutter Dev Podcast
+  yandex: 11609672
+- apple: id1457942497
+  google: aHR0cHM6Ly9mZWVkcy5zb3VuZGNsb3VkLmNvbS91c2Vycy9zb3VuZGNsb3VkOnVzZXJzOjYwNzU5Mzg4Mi9zb3VuZHMucnNz
+  name: Mobile People Talks
+  yandex: 9647763
+- apple: id1481440666
+  name: Appbooster
+- apple: id1057019371
+  google: aHR0cHM6Ly9wb2RzdGVyLmZtL3Jzcy54bWw_cGlkPTQxOTcx
+  name: '#DroiderCast'
+  yandex: 9048349
+- apple: id1681257958
+  google: aHR0cHM6Ly9jbG91ZC5tYXZlLmRpZ2l0YWwvNDQwNzQ
+  name: Из бэклога
+  yandex: 25334501

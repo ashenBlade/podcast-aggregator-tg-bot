@@ -61,7 +61,6 @@ class Podcast:
     id: int
     name: str
     providers: list[PodcastProvider]
-    tags: list[str]
 
     async def get_track_published_at(self, publish_date: date) -> PublishedTrack | None:
         provider_tracks: list[PublishedProviderTrack] = [
@@ -86,7 +85,6 @@ class Podcast:
             description=description,
             duration=duration,
             title=title,
-            podcast=self,
-            tags=self.tags
+            podcast=self
         )
 

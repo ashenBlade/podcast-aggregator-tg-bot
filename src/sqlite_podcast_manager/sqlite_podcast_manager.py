@@ -19,7 +19,7 @@ _logger = logging.getLogger(__name__)
 
 
 def parse_podcast_row(row: tuple):
-    id, name, tags_str, yc_album_id, gp_feed_id, ap_podcast_id = row
+    id, name, yc_album_id, gp_feed_id, ap_podcast_id = row
     providers = []
     if yc_album_id:
         providers.append(YandexMusicProvider(album=yc_album_id))
@@ -30,13 +30,10 @@ def parse_podcast_row(row: tuple):
     if ap_podcast_id:
         providers.append(ApplePodcastsProvider(podcast_id=ap_podcast_id))
 
-    tags = json.loads(tags_str) if tags_str else []
-
     return Podcast(
         id=id,
         name=name,
-        providers=providers,
-        tags=tags
+        providers=providers
     )
 
 
@@ -52,10 +49,10 @@ class SqlitePodcastManager:
         """
         cursor: sqlite3.Cursor
         with sqlite3.connect(self.database) as connection:
-            with connection.cursor() as cursor:
-                try:
-                    _logger.info('Начинаю создание схемы БД')
-                    cursor.executescript('''
+            cursor = connection.cursor()
+            try:
+                _logger.info('Начинаю создание схемы БД')
+                cursor.executescript('''
 begin;
 
 create table podcasts(
@@ -87,20 +84,17 @@ create unique index TRACKS_AP_TRACK_ID on tracks(ap_track_id);
 
 commit;
 ''')
-                    _logger.info("База данных инициализирована")
-                except sqlite3.OperationalError as oe:
-                    _logger.info("База данных уже инициализирована", exc_info=oe)
+                _logger.info("База данных инициализирована")
+            except sqlite3.OperationalError as oe:
+                _logger.info("База данных уже инициализирована", exc_info=oe)
+            finally:
+                cursor.close()
 
     async def get_all_podcasts(self) -> list[Podcast]:
         with sqlite3.connect(self.database) as connection:
             cursor = connection.execute(
-                'select p.id, p.name, '
-                '(case count(t.id) when 0 then null else json_group_array(t.tag) end) as tags, '
-                'p.yc_album_id, p.gp_feed_id, p.ap_podcast_id '
-                'from podcasts p '
-                'left join podcast_tag pt on p.id = pt.podcast_id '
-                'left join tags t on pt.tag_id = t.id '
-                'group by p.id, p.name, p.yc_album_id, p.gp_feed_id, p.ap_podcast_id;'
+                'select p.id, p.name, p.yc_album_id, p.gp_feed_id, p.ap_podcast_id '
+                'from podcasts p;'
             )
 
             return [

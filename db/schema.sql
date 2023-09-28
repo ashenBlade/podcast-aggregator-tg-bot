@@ -1,3 +1,4 @@
+begin;
 create table podcasts(
     id integer primary key autoincrement,
     name varchar not null,
@@ -24,3 +25,4 @@ create unique index TRACKS_TG_MESSAGE_ID on tracks(tg_message_id);
 create unique index TRACKS_YC_TRACK_ID on tracks(yc_track_id);
 create unique index TRACKS_GP_EPISODE_ID on tracks(gp_episode_id);
 create unique index TRACKS_AP_TRACK_ID on tracks(ap_track_id);
+commit;
