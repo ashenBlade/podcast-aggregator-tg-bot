@@ -57,6 +57,7 @@ class SqlitePodcastManager:
                     _logger.info('Начинаю создание схемы БД')
                     cursor.executescript('''
 begin;
+
 create table podcasts(
     id integer primary key autoincrement,
     name varchar not null,
@@ -66,6 +67,8 @@ create table podcasts(
 );
 
 create unique index PODCASTS_YC_ALBUM_ID on podcasts(yc_album_id);
+create unique index PODCASTS_GP_FEED_ID on podcasts(gp_feed_id);
+create unique index PODCASTS_AP_PODCAST_ID on podcasts(ap_podcast_id);
 
 create table tracks(
     id integer primary key autoincrement,
@@ -79,6 +82,9 @@ create table tracks(
 
 create unique index TRACKS_TG_MESSAGE_ID on tracks(tg_message_id);
 create unique index TRACKS_YC_TRACK_ID on tracks(yc_track_id);
+create unique index TRACKS_GP_EPISODE_ID on tracks(gp_episode_id);
+create unique index TRACKS_AP_TRACK_ID on tracks(ap_track_id);
+
 commit;
 ''')
                     _logger.info("База данных инициализирована")
@@ -206,3 +212,15 @@ commit;
                     return False
 
             return True
+
+    def seed_database(self, podcasts):
+        with sqlite3.connect(self.database) as connection:
+            cursor = connection.cursor()
+            for p in podcasts:
+                try:
+                    cursor.execute("""
+                INSERT INTO podcasts(name, yc_album_id, gp_feed_id, ap_podcast_id)
+                VALUES (?, ?, ?, ?) 
+                """, (p.name, p.yandex, p.google, p.apple))
+                except sqlite3.IntegrityError:
+                    _logger.debug('Подкаст %s уже есть в БД', p.name)

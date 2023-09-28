@@ -3,7 +3,7 @@ from datetime import timedelta
 
 from aiogram.utils import markdown as fmt
 
-from insfrastructure.utils import to_hashtag
+from infrastructure.utils import to_hashtag
 
 
 def format_duration(duration: timedelta):

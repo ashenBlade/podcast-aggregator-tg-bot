@@ -2,15 +2,15 @@ import asyncio
 import datetime
 import logging
 import os
-import time
 from datetime import timedelta, datetime
 
-from insfrastructure.app_settings import AppSettings
-from insfrastructure.name_track_pair import NameTrackPair
+from infrastructure.app_settings import AppSettings
+from infrastructure.name_track_pair import NameTrackPair
 from models.provider_track import ProviderTrack
 from models.published_track import PublishedTrack
 from sqlite_podcast_manager.sqlite_podcast_manager import SqlitePodcastManager
 from telegram_track_sender.telegram_track_sender import TelegramTrackSender
+from infrastructure.yaml_podcasts_loader import load_podcasts_info
 
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.DEBUG)
@@ -42,11 +42,14 @@ def get_app_settings():
     except (KeyError, ValueError):
         raise ValueError('Не удалось получить ID чата из переменной CHAT_ID')
 
+    yaml_file = os.environ.get('SEED_PODCASTS_FILE', None)
+
     return AppSettings(
         poll_interval=poll_interval,
         token=token,
         chat_id=chat_id,
-        database_file='podcasts.sqlite'
+        database_file='podcasts.sqlite',
+        seed_podcasts_yaml_file=yaml_file
     )
 
 
@@ -156,6 +159,15 @@ async def main():
     )
 
     podcast_manager.create_database()
+
+    if settings.seed_podcasts_yaml_file:
+        _logger.info("Открываю %s файл для загрузки подкастов", settings.seed_podcasts_yaml_file)
+        try:
+            with open(settings.seed_podcasts_yaml_file) as seed_file:
+                podcasts = load_podcasts_info(seed_file)
+                podcast_manager.seed_database(podcasts)
+        except FileNotFoundError as fnfe:
+            _logger.warning('Файл %s не найден', exc_info=fnfe)
 
     _logger.info('Работа приложения начинается')
     while True:
