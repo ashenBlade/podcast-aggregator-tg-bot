@@ -91,6 +91,10 @@ commit;
                 cursor.close()
 
     async def get_all_podcasts(self) -> list[Podcast]:
+        """
+        Получить все хранящиеся в БД подкасты
+        :return: Все подкасты из БД
+        """
         with sqlite3.connect(self.database) as connection:
             cursor = connection.execute(
                 'select p.id, p.name, p.yc_album_id, p.gp_feed_id, p.ap_podcast_id '
@@ -108,6 +112,14 @@ commit;
                              podcast_id: int,
                              publish_date: datetime,
                              provider_tracks: list[ProviderTrack]):
+        """
+        Сохранить новый трек в БД
+        :param tg_message_id: ID сообщения из телеграма, которое хранит ссылки на этот трек подкаста.
+        :param podcast_id: ID подкаста, трек которого сохраняем
+        :param publish_date: Дата публикации трека
+        :param provider_tracks: Треки провадеров. Каждый из них будет сохранять ID для своего источника
+        :return: ID созданного трека
+        """
         with sqlite3.connect(self.database) as connection:
             cursor = connection.cursor()
             cursor.execute('begin')
@@ -128,6 +140,14 @@ commit;
                 raise
 
     async def try_find_saved_track(self, track: PublishedTrack) -> SavedTrack | None:
+        """
+        Попытаться по переданному треку найти хранящийся трек в БД,
+        который имеет хотя-бы один индентичный ID провайдера.
+        Если такой найден, то этот трек является уже отправленным и
+        нужно обновить ссылки
+        :param track: Трек, для которого нужно найти соответствующий хранящийся
+        :return: Хранившийся трек, либо None, если трек никогда не отправлялся
+        """
         with sqlite3.connect(self.database) as connection:
             cursor = connection.cursor()
             for pt in track.provider_tracks:
@@ -186,6 +206,12 @@ commit;
                 )
 
     async def update_tracks(self, track_id: int, provider_tracks: list[ProviderTrack]):
+        """
+        Обновить информацию об отправленных треках провайдеров для сообщения с указанным track_id.
+        Каждый провадер обновляет свою информацию
+        :param track_id: ID трека, который нужно обновить
+        :param provider_tracks: треки различных провайдеров
+        """
         with sqlite3.connect(self.database) as connection:
             cursor = connection.cursor()
             cursor.execute('begin')
@@ -208,13 +234,24 @@ commit;
             return True
 
     def seed_database(self, podcasts):
+        """
+        Заполнить БД начальными подкастами
+        :param podcasts: список подкастов, которые нужно добавить в БД
+        :return:
+        """
         with sqlite3.connect(self.database) as connection:
             cursor = connection.cursor()
-            for p in podcasts:
-                try:
-                    cursor.execute("""
-                INSERT INTO podcasts(name, yc_album_id, gp_feed_id, ap_podcast_id)
-                VALUES (?, ?, ?, ?) 
-                """, (p.name, p.yandex, p.google, p.apple))
-                except sqlite3.IntegrityError:
-                    _logger.debug('Подкаст %s уже есть в БД', p.name)
+            try:
+                for p in podcasts:
+                    try:
+                        cursor.execute('begin')
+                        cursor.execute("""
+                    INSERT INTO podcasts(name, yc_album_id, gp_feed_id, ap_podcast_id)
+                    VALUES (?, ?, ?, ?) 
+                    """, (p.name, p.yandex, p.google, p.apple))
+                        cursor.execute('commit')
+                    except sqlite3.IntegrityError:
+                        _logger.debug('Подкаст %s уже есть в БД', p.name)
+                        cursor.execute('rollback')
+            finally:
+                cursor.close()
