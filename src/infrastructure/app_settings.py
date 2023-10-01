@@ -8,3 +8,4 @@ class AppSettings:
     chat_id: int
     token: str
     database_file: str
+    seed_podcasts_yaml_file: str | None

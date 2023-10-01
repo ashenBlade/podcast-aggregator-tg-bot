@@ -40,6 +40,17 @@ class TelegramTrackSender:
                          duration: timedelta,
                          track_sources: list[TrackSource],
                          tags: list[str]):
+        """
+        Отправить новое сообщение и вернуть его ID
+        :param title: Заголовок трека
+        :param description: Описание трека
+        :param podcast: Название подкаста
+        :param duration: Длительность трека
+        :param track_sources: Источники, где можно послушать
+        :param tags: Тэги трека/подкаста
+        :return: ID отправленного сообщения
+        """
+
         formatted_message = format_track_markdown(title, description, podcast, duration, tags)
         keyboard = create_reply_source_url_keyboard(track_sources)
         message = await self.bot.send_message(
@@ -51,6 +62,13 @@ class TelegramTrackSender:
         return message.message_id
 
     async def update_track_sources(self, message_id: int, track_sources: list[TrackSource]):
+        """
+        Обновить источники трека, у существующего сообщения.
+        Все источники заменяются полностью!
+
+        :param message_id: ID сообщения
+        :param track_sources: Источники трека
+        """
         keyboard = create_reply_source_url_keyboard(track_sources)
         await self.bot.edit_message_reply_markup(
             chat_id=self.chat_id,

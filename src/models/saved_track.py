@@ -7,6 +7,9 @@ if TYPE_CHECKING:
 
 @dataclass
 class SavedTrack:
+    """
+    Трек подкаста, сохраненный в БД
+    """
     id: int
     tg_message_id: int
     saved_provider_tracks: list['ProviderTrack']

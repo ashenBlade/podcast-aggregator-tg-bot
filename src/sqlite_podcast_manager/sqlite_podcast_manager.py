@@ -19,7 +19,7 @@ _logger = logging.getLogger(__name__)
 
 
 def parse_podcast_row(row: tuple):
-    id, name, tags_str, yc_album_id, gp_feed_id, ap_podcast_id = row
+    id, name, yc_album_id, gp_feed_id, ap_podcast_id = row
     providers = []
     if yc_album_id:
         providers.append(YandexMusicProvider(album=yc_album_id))
@@ -30,13 +30,10 @@ def parse_podcast_row(row: tuple):
     if ap_podcast_id:
         providers.append(ApplePodcastsProvider(podcast_id=ap_podcast_id))
 
-    tags = json.loads(tags_str) if tags_str else []
-
     return Podcast(
         id=id,
         name=name,
-        providers=providers,
-        tags=tags
+        providers=providers
     )
 
 
@@ -46,16 +43,62 @@ class SqlitePodcastManager:
     def __init__(self, database: str):
         self.database = database
 
+    def create_database(self):
+        """
+        Инициализировать схему БД
+        """
+        cursor: sqlite3.Cursor
+        with sqlite3.connect(self.database) as connection:
+            cursor = connection.cursor()
+            try:
+                _logger.info('Начинаю создание схемы БД')
+                cursor.executescript('''
+begin;
+
+create table podcasts(
+    id integer primary key autoincrement,
+    name varchar not null,
+    yc_album_id integer,
+    gp_feed_id varchar null,
+    ap_podcast_id varchar
+);
+
+create unique index PODCASTS_YC_ALBUM_ID on podcasts(yc_album_id);
+create unique index PODCASTS_GP_FEED_ID on podcasts(gp_feed_id);
+create unique index PODCASTS_AP_PODCAST_ID on podcasts(ap_podcast_id);
+
+create table tracks(
+    id integer primary key autoincrement,
+    podcast_id integer references podcasts(id) not null,
+    tg_message_id integer not null,
+    publish_date timestamp not null,
+    yc_track_id integer,
+    ap_track_id integer null,
+    gp_episode_id varchar
+);
+
+create unique index TRACKS_TG_MESSAGE_ID on tracks(tg_message_id);
+create unique index TRACKS_YC_TRACK_ID on tracks(yc_track_id);
+create unique index TRACKS_GP_EPISODE_ID on tracks(gp_episode_id);
+create unique index TRACKS_AP_TRACK_ID on tracks(ap_track_id);
+
+commit;
+''')
+                _logger.info("База данных инициализирована")
+            except sqlite3.OperationalError as oe:
+                _logger.info("База данных уже инициализирована", exc_info=oe)
+            finally:
+                cursor.close()
+
     async def get_all_podcasts(self) -> list[Podcast]:
+        """
+        Получить все хранящиеся в БД подкасты
+        :return: Все подкасты из БД
+        """
         with sqlite3.connect(self.database) as connection:
             cursor = connection.execute(
-                'select p.id, p.name, '
-                '(case count(t.id) when 0 then null else json_group_array(t.tag) end) as tags, '
-                'p.yc_album_id, p.gp_feed_id, p.ap_podcast_id '
-                'from podcasts p '
-                'left join podcast_tag pt on p.id = pt.podcast_id '
-                'left join tags t on pt.tag_id = t.id '
-                'group by p.id, p.name, p.yc_album_id, p.gp_feed_id, p.ap_podcast_id;'
+                'select p.id, p.name, p.yc_album_id, p.gp_feed_id, p.ap_podcast_id '
+                'from podcasts p;'
             )
 
             return [
@@ -69,6 +112,14 @@ class SqlitePodcastManager:
                              podcast_id: int,
                              publish_date: datetime,
                              provider_tracks: list[ProviderTrack]):
+        """
+        Сохранить новый трек в БД
+        :param tg_message_id: ID сообщения из телеграма, которое хранит ссылки на этот трек подкаста.
+        :param podcast_id: ID подкаста, трек которого сохраняем
+        :param publish_date: Дата публикации трека
+        :param provider_tracks: Треки провадеров. Каждый из них будет сохранять ID для своего источника
+        :return: ID созданного трека
+        """
         with sqlite3.connect(self.database) as connection:
             cursor = connection.cursor()
             cursor.execute('begin')
@@ -89,6 +140,14 @@ class SqlitePodcastManager:
                 raise
 
     async def try_find_saved_track(self, track: PublishedTrack) -> SavedTrack | None:
+        """
+        Попытаться по переданному треку найти хранящийся трек в БД,
+        который имеет хотя-бы один индентичный ID провайдера.
+        Если такой найден, то этот трек является уже отправленным и
+        нужно обновить ссылки
+        :param track: Трек, для которого нужно найти соответствующий хранящийся
+        :return: Хранившийся трек, либо None, если трек никогда не отправлялся
+        """
         with sqlite3.connect(self.database) as connection:
             cursor = connection.cursor()
             for pt in track.provider_tracks:
@@ -147,6 +206,12 @@ class SqlitePodcastManager:
                 )
 
     async def update_tracks(self, track_id: int, provider_tracks: list[ProviderTrack]):
+        """
+        Обновить информацию об отправленных треках провайдеров для сообщения с указанным track_id.
+        Каждый провадер обновляет свою информацию
+        :param track_id: ID трека, который нужно обновить
+        :param provider_tracks: треки различных провайдеров
+        """
         with sqlite3.connect(self.database) as connection:
             cursor = connection.cursor()
             cursor.execute('begin')
@@ -160,6 +225,12 @@ class SqlitePodcastManager:
                 raise e
 
     async def all_provider_track_saved(self, provider_tracks: list[ProviderTrack]):
+        """
+        Сделать проверку, что все треки уже есть в БД.
+        Это нужно при обновлении источников для сообщения
+        :param provider_tracks: Треки провайдеров
+        :return: True, если все треки уже есть в БД (указаны в ссылках сообщения), иначе False
+        """
         with sqlite3.connect(self.database) as connection:
             cursor = connection.cursor()
             for pt in provider_tracks:
@@ -167,3 +238,26 @@ class SqlitePodcastManager:
                     return False
 
             return True
+
+    def seed_database(self, podcasts):
+        """
+        Заполнить БД начальными подкастами
+        :param podcasts: список подкастов, которые нужно добавить в БД
+        :return:
+        """
+        with sqlite3.connect(self.database) as connection:
+            cursor = connection.cursor()
+            try:
+                for p in podcasts:
+                    try:
+                        cursor.execute('begin')
+                        cursor.execute("""
+                    INSERT INTO podcasts(name, yc_album_id, gp_feed_id, ap_podcast_id)
+                    VALUES (?, ?, ?, ?) 
+                    """, (p.name, p.yandex, p.google, p.apple))
+                        cursor.execute('commit')
+                    except sqlite3.IntegrityError:
+                        _logger.debug('Подкаст %s уже есть в БД', p.name)
+                        cursor.execute('rollback')
+            finally:
+                cursor.close()

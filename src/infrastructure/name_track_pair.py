@@ -5,14 +5,20 @@ from models.provider_track import ProviderTrack
 
 @dataclass
 class NameTrackPair:
+    """
+    Специальный тип, который используется для получения результирующего списка источников треков,
+    когда трек уже был опубликован
+    """
+    track: ProviderTrack
+
     @property
     def name(self):
         return self.track.provider_name
 
-    track: ProviderTrack
-
     def __init__(self, track: ProviderTrack):
         self.track = track
+
+    # Переопределяем магические методы, чтобы работал set
 
     def __hash__(self):
         return hash(self.name)

@@ -1,6 +1,6 @@
 import pytest as pytest
 
-from insfrastructure.utils import to_hashtag
+from infrastructure.utils import to_hashtag
 
 
 @pytest.mark.parametrize('text,expected', [
